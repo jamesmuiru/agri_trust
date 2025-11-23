@@ -1,0 +1,62 @@
+name: agriconnect
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI & Design
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.1.0
+  animate_do: ^3.3.4
+
+  # Firebase (The Backend)
+  firebase_core: ^4.2.1
+  firebase_auth: ^6.1.2
+  cloud_firestore: ^6.1.0
+  firebase_storage: ^13.0.4
+
+  # State & Logic
+  provider: ^6.1.5+1
+  image_picker: ^1.0.5
+  http: ^1.3.0
+  geolocator: ^14.0.2
+  
+  # Maps (Leaflet)
+  flutter_map: ^7.0.0
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.0
+  
+  # Utilities
+  intl: ^0.20.2
+  audioplayers: ^6.0.0
+  
+  # PDF Receipts
+  pdf: ^3.10.4
+  printing: ^5.11.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # Icon Generator (Keep this if you want to update icons later)
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+
+# Icon Configuration
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/logo.png"

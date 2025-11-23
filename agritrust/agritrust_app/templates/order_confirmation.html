@@ -1,0 +1,13 @@
+<!-- order_confirmation.html -->
+<div class="blockchain-info">
+    <h3>🔗 Blockchain Transaction</h3>
+    <p><strong>Contract Hash:</strong> {{ order.blockchain_tx_hash }}</p>
+    <p><strong>Status:</strong> 
+        {% if order.escrow_released %}
+            ✅ Escrow Released (Hash: {{ order.escrow_release_hash }})
+        {% else %}
+            ⏳ Funds in Escrow
+        {% endif %}
+    </p>
+    <p><small>This transaction is secured on our simulated blockchain network</small></p>
+</div>

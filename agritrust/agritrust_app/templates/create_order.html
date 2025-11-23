@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Order - AgriTrust{% endblock %}
+
+{% block content %}
+<style>
+    .order-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .order-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .order-header h2 {
+        color: #2e7d32;
+        margin-bottom: 0.5rem;
+    }
+
+    .produce-summary {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #2e7d32;
+    }
+
+    .produce-info {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .produce-icon {
+        font-size: 3rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .produce-details h3 {
+        color: #2e7d32;
+        margin-bottom: 0.5rem;
+    }
+
+    .price-info {
+        background: #e8f5e8;
+        padding: 1rem;
+        border-radius: 6px;
+        margin: 1rem 0;
+        text-align: center;
+    }
+
+    .price-label {
+        font-weight: 500;
+        color: #2e7d32;
+    }
+
+    .price-amount {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2e7d32;
+    }
+
+    .availability {
+        color: #666;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .total-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+    .total-label {
+        font-weight: 500;
+        color: #666;
+    }
+
+    .total-amount {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #2e7d32;
+        margin: 0.5rem 0;
+    }
+
+    .blockchain-note {
+        background: #e3f2fd;
+        padding: 1rem;
+        border-radius: 6px;
+        margin: 1.5rem 0;
+        border-left: 4px solid #1976d2;
+    }
+
+    .blockchain-note h4 {
+        color: #1976d2;
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .produce-info {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="order-container">
+    <div class="order-header">
+        <h2>Create Order</h2>
+        <p>Purchase fresh produce from our trusted farmers</p>
+    </div>
+
+    <div class="produce-summary">
+        <div class="produce-info">
+            <div class="produce-icon">
+                {% if produce.produce_type == 'vegetables' %}🥦
+                {% elif produce.produce_type == 'fruits' %}🍎
+                {% elif produce.produce_type == 'grains' %}🌾
+                {% elif produce.produce_type == 'legumes' %}🥜
+                {% else %}🥔{% endif %}
+            </div>
+            <div class="produce-details">
+                <h3>{{ produce.name }}</h3>
+                <p>Grade {{ produce.quality_grade }} • {{ produce.produce_type|title }}</p>
+                <p>From: {{ produce.farmer.get_full_name|default:produce.farmer.username }}</p>
+            </div>
+        </div>
+        
+        <div class="price-info">
+            <div class="price-label">Price per {{ produce.unit }}</div>
+            <div class="price-amount">KSh {{ produce.price_per_unit }}</div>
+        </div>
+        
+        <div class="availability">
+            {{ produce.quantity }} {{ produce.unit }} available • Harvested: {{ produce.harvest_date }}
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'create-order-api' %}">
+        {% csrf_token %}
+        <input type="hidden" name="produce_id" value="{{ produce.id }}">
+        
+        <div class="form-group">
+            <label class="form-label">Quantity ({{ produce.unit }}) *</label>
+            <input type="number" name="quantity" class="form-control" required 
+                   min="0.1" step="0.1" max="{{ produce.quantity }}"
+                   placeholder="Enter quantity" oninput="calculateTotal()">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Delivery Address *</label>
+            <textarea name="delivery_address" class="form-control" rows="3" required 
+                      placeholder="Enter complete delivery address"></textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Delivery Latitude (optional)</label>
+                <input type="number" name="delivery_latitude" class="form-control" step="any"
+                       placeholder="e.g., -1.2921">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Delivery Longitude (optional)</label>
+                <input type="number" name="delivery_longitude" class="form-control" step="any"
+                       placeholder="e.g., 36.8219">
+            </div>
+        </div>
+
+        <div class="total-section">
+            <div class="total-label">Total Amount</div>
+            <div class="total-amount" id="totalAmount">KSh 0.00</div>
+            <div class="availability" id="quantityMessage">Enter quantity to see total</div>
+        </div>
+
+        <div class="blockchain-note">
+            <h4>🔒 Secure Blockchain Transaction</h4>
+            <p>Your payment will be held in escrow using smart contract technology and released to the farmer only after successful delivery confirmation.</p>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Confirm Order</button>
+            <a href="{% url 'produce-list-page' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function calculateTotal() {
+        const quantityInput = document.querySelector('input[name="quantity"]');
+        const pricePerUnit = {{ produce.price_per_unit }};
+        const maxQuantity = {{ produce.quantity }};
+        const quantity = parseFloat(quantityInput.value) || 0;
+        
+        const totalAmount = quantity * pricePerUnit;
+        document.getElementById('totalAmount').textContent = 'KSh ' + totalAmount.toFixed(2);
+        
+        const quantityMessage = document.getElementById('quantityMessage');
+        if (quantity > maxQuantity) {
+            quantityMessage.textContent = '❌ Quantity exceeds available stock';
+            quantityMessage.style.color = '#dc3545';
+        } else if (quantity > 0) {
+            quantityMessage.textContent = `✅ ${maxQuantity - quantity} ${'{{ produce.unit }}'} remaining`;
+            quantityMessage.style.color = '#28a745';
+        } else {
+            quantityMessage.textContent = 'Enter quantity to see total';
+            quantityMessage.style.color = '#666';
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const quantityInput = document.querySelector('input[name="quantity"]');
+        quantityInput.addEventListener('input', calculateTotal);
+        
+        // Set max attribute for validation
+        quantityInput.max = {{ produce.quantity }};
+    });
+</script>
+{% endblock %}

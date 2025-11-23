@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, rgba(46,125,50,0.9) 0%, rgba(56,142,60,0.9) 100%),
+                    url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        text-align: center;
+        padding: 4rem 0;
+        margin: 2rem 0;
+        border-radius: 8px;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 3rem 0;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #2e7d32;
+    }
+
+    .cta-section {
+        text-align: center;
+        padding: 3rem 0;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin: 2rem 0;
+    }
+</style>
+
+<div class="hero">
+    <h1>Welcome to AgriTrust</h1>
+    <p>Connecting Kenyan farmers directly with buyers through our secure, transparent marketplace platform</p>
+    <a href="{% url 'register-page' %}" class="btn btn-primary">Get Started</a>
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-icon">🌾</div>
+        <h3>Fresh Produce</h3>
+        <p>Access high-quality farm produce directly from local farmers across Kenya</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3>Fair Prices</h3>
+        <p>AI-powered pricing ensures fair compensation for farmers and reasonable prices for buyers</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🚚</div>
+        <h3>Efficient Delivery</h3>
+        <p>Optimized logistics and route planning for timely deliveries</p>
+    </div>
+</div>
+
+<div class="cta-section">
+    <h2>Ready to join our farming community?</h2>
+    <p>Register today and start trading with confidence</p>
+    <a href="{% url 'register-page' %}" class="btn btn-primary">Sign Up Now</a>
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - AgriTrust{% endblock %}
+
+{% block content %}
+<style>
+    .auth-container {
+        max-width: 500px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-header h2 {
+        color: #2e7d32;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+        color: #666;
+    }
+
+    .user-type-selector {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .user-type-btn {
+        padding: 1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: white;
+    }
+
+    .user-type-btn:hover {
+        border-color: #2e7d32;
+    }
+
+    .user-type-btn.active {
+        border-color: #2e7d32;
+        background-color: #e8f5e8;
+        transform: scale(1.02);
+    }
+
+    .user-type-btn i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-actions {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+    }
+
+    .login-link a {
+        color: #2e7d32;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .user-type-selector {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <h2>Create Your Account</h2>
+        <p>Join AgriTrust as a farmer, buyer, or logistics partner</p>
+    </div>
+
+    <form method="POST" action="{% url 'register-api' %}">
+        {% csrf_token %}
+        
+        <div class="user-type-selector">
+            <label class="user-type-btn">
+                <input type="radio" name="user_type" value="farmer" required>
+                <i>🌾</i>
+                Farmer
+            </label>
+            <label class="user-type-btn">
+                <input type="radio" name="user_type" value="buyer" required>
+                <i>🛒</i>
+                Buyer
+            </label>
+            <label class="user-type-btn">
+                <input type="radio" name="user_type" value="logistics" required>
+                <i>🚚</i>
+                Logistics
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Username *</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="first_name" class="form-control" placeholder="First Name">
+            <input type="text" name="last_name" class="form-control" placeholder="Last Name" style="margin-top: 0.5rem;">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Location *</label>
+            <input type="text" name="location" class="form-control" required placeholder="e.g., Nairobi, Kenya">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" name="phone_number" class="form-control" placeholder="+254 XXX XXX XXX">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Account</button>
+        </div>
+    </form>
+
+    <div class="login-link">
+        <p>Already have an account? <a href="{% url 'login-page' %}">Sign in here</a></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userTypeBtns = document.querySelectorAll('.user-type-btn');
+        
+        userTypeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                userTypeBtns.forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Check the radio input
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        // Form validation
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const userType = document.querySelector('input[name="user_type"]:checked');
+            if (!userType) {
+                e.preventDefault();
+                alert('Please select your user type');
+            }
+        });
+    });
+</script>
+{% endblock %}

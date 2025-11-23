@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Farms Map - AgriTrust{% endblock %}
+
+{% block content %}
+<style>
+    .map-header {
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+    .map-header h1 {
+        color: #2e7d32;
+        margin-bottom: 0.5rem;
+    }
+
+    .map-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #2e7d32;
+        margin: 0.5rem 0;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .map-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-height: 500px;
+    }
+
+    .map-placeholder {
+        background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+        border-radius: 8px;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 1.2rem;
+    }
+
+    .farms-list {
+        margin-top: 2rem;
+    }
+
+    .farm-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        border-left: 4px solid #2e7d32;
+    }
+
+    .farm-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .farm-name {
+        color: #2e7d32;
+        font-weight: 600;
+    }
+
+    .farm-produce {
+        background: #2e7d32;
+        color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+
+    .farm-details {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .farm-location {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .map-stats {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        
+        .farm-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+<div class="map-header">
+    <h1>Farms Map</h1>
+    <p>Discover farms and producers across Kenya</p>
+</div>
+
+<div class="map-stats">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_farms }}</div>
+        <div class="stat-label">Total Farms</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-number">{{ farms_data|length }}</div>
+        <div class="stat-label">Active Farms</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-number">25+</div>
+        <div class="stat-label">Counties Covered</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-number">1000+</div>
+        <div class="stat-label">Products Listed</div>
+    </div>
+</div>
+
+<div class="map-container">
+    <h2 style="margin-bottom: 1.5rem; color: #2e7d32;">Interactive Farms Map</h2>
+    
+    <div class="map-placeholder">
+        <div style="text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
+            <h3>Interactive Map</h3>
+            <p>Farm locations would be displayed here with interactive markers</p>
+            <p style="font-size: 0.9rem; margin-top: 1rem; color: #999;">
+                Map integration with GISService would show actual farm locations
+            </p>
+        </div>
+    </div>
+    
+    {% if map_html %}
+        {{ map_html|safe }}
+    {% endif %}
+</div>
+
+<div class="farms-list">
+    <h2 style="margin-bottom: 1.5rem; color: #2e7d32;">Featured Farms</h2>
+    
+    {% if farms_data %}
+        {% for farm in farms_data %}
+        <div class="farm-card">
+            <div class="farm-header">
+                <h3 class="farm-name">{{ farm.name }}</h3>
+                <span class="farm-produce">{{ farm.produce_count }} products</span>
+            </div>
+            
+            <div class="farm-details">
+                <p><strong>Location:</strong> {{ farm.location }}</p>
+                <p><strong>Coordinates:</strong> {{ farm.latitude }}, {{ farm.longitude }}</p>
+                
+                <div class="farm-location">
+                    <span>📍</span>
+                    <span>Located in {{ farm.location }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <h3>No farms available</h3>
+        <p>Farm information will appear here once available</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simulate map loading
+        const mapPlaceholder = document.querySelector('.map-placeholder');
+        
+        setTimeout(() => {
+            mapPlaceholder.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🌱</div>
+                    <h3>Farm Map Loaded</h3>
+                    <p>Showing {{ farms_data|length }} farms across Kenya</p>
+                    <div style="margin-top: 2rem;">
+                        <button class="btn btn-primary">View Full Screen Map</button>
+                    </div>
+                </div>
+            `;
+        }, 2000);
+    });
+</script>
+{% endblock %}
