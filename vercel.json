@@ -1,5 +1,11 @@
 {
+<<<<<<< HEAD
     "public": "true",
     "cleanUrls": true
   }
   
+=======
+  "public": true,
+  "cleanUrls": true
+}
+>>>>>>> 26616dc476f1bc0ba1a11a11fee4218626d37098
